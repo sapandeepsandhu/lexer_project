@@ -1,0 +1,4 @@
+int main() {
+    char *s = "This string never ends;
+    return 0;
+}

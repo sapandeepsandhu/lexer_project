@@ -1,0 +1,23 @@
+// Testing struct and nested structures
+struct Point {
+    float x;
+    float y;
+};
+
+struct Rectangle {
+    struct Point topLeft;
+    struct Point bottomRight;
+    int id;
+};
+
+int main() {
+    struct Point p1;
+    p1.x = 10.5;
+    p1.y = 20.3;
+    
+    struct Rectangle rect;
+    rect.topLeft.x = 0.0;
+    rect.id = 1;
+    
+    return 0;
+}

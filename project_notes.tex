@@ -1,0 +1,180 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{background}
+
+\backgroundsetup{
+  scale=1.5,
+  color=black,
+  opacity=0.1,
+  angle=45,
+  position=current page.center,
+  vshift=0cm,
+  contents={Created and Compiled by Sapandeep Singh Sandhu}
+}
+
+% Page geometry
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+}
+
+% Code highlighting settings
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{\textbf{CS Compiler Design: Lexical Analysis Lecture Notes}}
+\author{Detailed Project Walkthrough}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\vspace{1cm}
+
+\section{Introduction}
+This document serves as both a project report and a set of \textbf{Teacher-Style Lecture Notes} for understanding the design and implementation of a Lexical Analyzer (Scanner). We have implemented a working lexer in C that tokenizes a subset of the C language.
+
+\section{Project Validation}
+Does this implementation meet the core requirements of a standard lexical analyzer?
+
+\begin{itemize}
+    \item[\checkmark] \textbf{Ignores redundant whitespace}: Spaces, tabs, and newlines are skipped efficiently.
+    \item[\checkmark] \textbf{Ignores comments}: Successfully handles both single-line \texttt{//} and multi-line \texttt{/*...*/} comments.
+    \item[\checkmark] \textbf{Token Recognition}: Correctly groups keywords, identifiers, integers, floats, strings, chars, and operators.
+    \item[\checkmark] \textbf{Identifier Logic}: Implements "arbitrarily long" identifiers in theory, but restricts them to a reasonable safety limit (64 chars) to prevent buffer overflows.
+    \item[\checkmark] \textbf{Simulation}: This is a fully functional scanner simulation in standard C.
+\end{itemize}
+
+\section{Theoretical Foundations}
+
+\subsection{What is a Lexical Analyzer?}
+A lexical analyzer reads the program \textbf{character-by-character} and groups them into \textbf{tokens}.
+\\
+\textbf{Example Input:} \texttt{int total = 10 + 20;}
+\\
+\textbf{Token Stream Output:}
+\begin{itemize}
+    \item \texttt{int} $\rightarrow$ KEYWORD
+    \item \texttt{total} $\rightarrow$ IDENTIFIER
+    \item \texttt{=} $\rightarrow$ OPERATOR
+    \item \texttt{10} $\rightarrow$ INT
+    \item \texttt{+} $\rightarrow$ OPERATOR
+    \item \texttt{20} $\rightarrow$ INT
+    \item \texttt{;} $\rightarrow$ SEPARATOR
+\end{itemize}
+
+\textbf{Why do we need this?} Parsing (syntax analysis) is significantly easier when the parser sees discrete \textbf{tokens} rather than a raw, messy stream of characters.
+
+\section{Detailed Implementation Walkthrough}
+
+\subsection{Global Organization}
+The lexer typically works in a simplified standard pipeline:
+\begin{enumerate}
+    \item \textbf{Skip Phase}: Consume all whitespace and comments.
+    \item \textbf{Decide Phase}: Peek at the next character to determine the token class (e.g., if it's a digit, it's a number).
+    \item \textbf{Scan Phase}: Read the full lexeme (word/number).
+    \item \textbf{Return}: Produce a single token struct.
+    \item Repeat until \textbf{EOF}.
+\end{enumerate}
+
+\subsection{Token Definitions}
+We distinguish token classes using an \texttt{enum} (e.g., \texttt{TOK\_KEYWORD}, \texttt{TOK\_INT}). 
+\\
+\textbf{Why?} The parser must treat \texttt{if} differently from a variable named \texttt{result}.
+\\
+We also store \textbf{Lexemes} (the actual text) and \textbf{Position} (line/col).
+\\
+\textbf{Why?} Position tracking is critical for meaningful error messages (e.g., "Error at line 10, col 5").
+
+\subsection{Scanning Logic: The "How-To"}
+
+\subsubsection{1. Reading \& Position Tracking}
+We implement a \texttt{read\_char()} function.
+\begin{itemize}
+    \item Reads one char from file.
+    \item Unique logic: If char is \texttt{\\n}, increment \texttt{line} and reset \texttt{col}.
+\end{itemize}
+We also use \texttt{unread\_char()} (Lookahead). This pushes a character \textit{back} onto the stream. This is essential when we read one character too far to determine a token's end (e.g., distinguishing \texttt{123} from \texttt{123.}).
+
+\subsubsection{2. Identifier vs. Keyword}
+\textbf{The Problem:} \texttt{if} (keyword) and \texttt{index} (identifier) look structurally identical (letters).
+\\
+\textbf{The Solution:}
+\begin{enumerate}
+    \item Scan the full word assuming it is an identifier.
+    \item Check the word against a strictly defined \textbf{Keyword Table}.
+    \item If a match is found, re-label it as \texttt{TOK\_KEYWORD}.
+\end{enumerate}
+Our implementation also enforces a \texttt{MAX\_ID\_LEN} (64). While abstract theory allows infinite length, real computers have finite memory, making this a practical and "reasonable" safety constraint.
+
+\subsubsection{3. Number Scanning (Int vs Float)}
+\begin{itemize}
+    \item \textbf{Step 1}: Read consecutive digits.
+    \item \textbf{Step 2}: If a dot (\texttt{.}) is found, switch mode to \textbf{FLOAT} and read fractional digits.
+    \item \textbf{Note}: This simple scanner does not handle scientific notation (e.g., \texttt{1.2e-3}), which is acceptable for a mini-project.
+\end{itemize}
+
+\subsubsection{4. String \& Char Literals}
+\begin{itemize}
+    \item \textbf{Strings}: Read from opening \texttt{"} to closing \texttt{"}. We handle escaped quotes (\texttt{\\"}) by ensuring the loop doesn't stop prematurely.
+    \item \textbf{Error Case}: If we hit a newline before the closing quote, we immediately return \texttt{TOK\_ERROR}. This catches "Unterminated string" bugs.
+\end{itemize}
+
+\subsubsection{5. Operators \& Sort-Order Logic}
+We check for \textbf{Longest Match First}.
+\begin{itemize}
+    \item We first check for 2-character operators (e.g., \texttt{==}, \texttt{<=}).
+    \item If no match, we fall back to single-character operators (e.g., \texttt{=}, \texttt{<}).
+    \item If we checked single-chars first, \texttt{==} might be mistakenly read as two separate \texttt{=} tokens.
+\end{itemize}
+
+\section{Critical Analysis}
+\textit{A note on correctness and edge cases.}
+
+While the tokenization logic is robust, there is a subtle nuance in position tracking concerning \texttt{unread\_char()}.
+
+\begin{quote}
+\textbf{The Issue:} If we read a newline (\texttt{\\n}) and then unread it, our simple \texttt{unread\_char} logic does not decrement the line counter.
+\end{quote}
+
+In practice, this means if a token (like a number) ends exactly at a newline, the line count for the \textit{next} token might be slightly off.
+\\
+\textbf{Fix Idea:} A production-grade compiler would use a robust \texttt{peek\_char()} function that buffers the character without advancing the file pointer, or a more complex state machine for newline history. For this simulation, the current approach is functional and standard for student-level projects.
+
+\section{Conclusion}
+This implementation meets all assignment criteria. It simulates the core "brain" of a compiler frontend—managing messy input streams and delivering clean, structured tokens to the next phase of compilation.
+
+\end{document}

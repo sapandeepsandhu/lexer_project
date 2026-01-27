@@ -1,0 +1,16 @@
+// Testing strings and character literals
+int main() {
+    char c1 = 'a';
+    char c2 = 'Z';
+    char c3 = '0';
+    char c4 = '\t';
+    char c5 = '\n';
+    char c6 = '\\';
+    
+    char *str1 = "Hello World";
+    char *str2 = "Line 1\nLine 2";
+    char *str3 = "Path: C:\\Users\\Name";
+    char arr[50] = "Static string";
+    
+    return 0;
+}

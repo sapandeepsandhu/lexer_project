@@ -1,0 +1,16 @@
+// Testing arrays and pointers
+int arr[10];
+float matrix[3][4];
+char *ptr = NULL;
+
+void processArray(int *data, int size) {
+    for (int i = 0; i < size; i++) {
+        data[i] = i * 2;
+    }
+}
+
+int main() {
+    int numbers[5] = {1, 2, 3, 4, 5};
+    char str[100];
+    return 0;
+}

@@ -1,0 +1,23 @@
+// Testing different loop structures
+int main() {
+    // while loop
+    int count = 0;
+    while (count < 10) {
+        count++;
+    }
+    
+    // for loop
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 3; j++) {
+            // nested loop
+        }
+    }
+    
+    // do-while
+    int n = 0;
+    do {
+        n += 1;
+    } while (n < 100);
+    
+    return 0;
+}

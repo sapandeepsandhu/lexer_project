@@ -1,0 +1,30 @@
+# LaTeX build files
+*.aux
+*.log
+*.out
+*.pdf
+*.toc
+
+# Compiled binaries
+lexer
+*.o
+*.a
+*.so
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test artifacts
+*.out

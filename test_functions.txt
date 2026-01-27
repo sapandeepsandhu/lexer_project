@@ -1,0 +1,24 @@
+// Testing function declarations and calls
+int add(int a, int b);
+float multiply(float x, float y);
+void printMessage(char *msg);
+
+int add(int a, int b) {
+    return a + b;
+}
+
+float multiply(float x, float y) {
+    return x * y;
+}
+
+void printMessage(char *msg) {
+    // function body
+    return;
+}
+
+int main() {
+    int result = add(5, 3);
+    float product = multiply(2.5, 4.0);
+    printMessage("Hello World");
+    return 0;
+}

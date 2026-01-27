@@ -1,0 +1,23 @@
+// Testing various operators
+int main() {
+    int a = 10, b = 20;
+    int sum = a + b;
+    int diff = a - b;
+    int prod = a * b;
+    int div = a / b;
+    int mod = a % b;
+    
+    int x = a & b;  // bitwise AND
+    int y = a | b;  // bitwise OR
+    int z = a ^ b;  // bitwise XOR
+    int w = ~a;     // bitwise NOT
+    
+    if (a > b && b < 30) {
+        a++;
+        b--;
+    }
+    
+    a += 5;
+    b -= 3;
+    return 0;
+}

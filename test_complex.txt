@@ -1,0 +1,40 @@
+// Complex program combining multiple features
+#include <stdio.h>
+
+const int MAX = 100;
+
+struct Data {
+    int id;
+    float value;
+    char name[64];
+};
+
+int calculate(int a, int b) {
+    // Perform calculation
+    int temp = a + b;
+    return temp * 2;
+}
+
+int main() {
+    struct Data records[5];
+    int i = 0;
+    
+    while (i < MAX) {
+        records[i].id = i;
+        records[i].value = 3.14 * i;
+        
+        if (i % 2 == 0) {
+            int res = calculate(i, 10);
+        } else {
+            continue;
+        }
+        
+        i++;
+    }
+    
+    for (int j = 0; j < 5; j++) {
+        char *msg = "Processing";
+    }
+    
+    return 0;
+}
