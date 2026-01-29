@@ -2,10 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #define MAX_LEXEME_LEN 256
 #define MAX_ID_LEN 64 // "reasonable" identifier limit
-
 typedef enum {
   TOK_EOF,
   TOK_KEYWORD,
